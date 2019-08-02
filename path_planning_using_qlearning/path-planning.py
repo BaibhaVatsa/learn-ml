@@ -106,6 +106,8 @@ if __name__ == "__main__":
 
     rewards = init_rewards(reward)
     
+    np.save('rewards', rewards)
+
     # # rewards = [
     # #     [0, -1, -1, -1, 0, -1],
     # #     [-1, 0, -1, 0, -1, 100],
@@ -122,5 +124,7 @@ if __name__ == "__main__":
             gamma = gamma_val
         )
   
+    np.save('q', q)
+
     # # Test
     test_q(q, stop_max)
