@@ -1,11 +1,21 @@
 #include <vector>
 #include <iostream>
+#include "Dictionary.h"
 
 void printHelp();
 std::vector<std::string> parseInput(int argc, char** argv);
 
 int main(int argc, char** argv) {
+    const std::string OUTPUTFILEPATH("outputs/");
+    const std::string TEXTSFILEPATH("texts/");
+
     std::vector<std::string> authors = parseInput(argc, argv);
+
+    Dictionary dict;
+    for (const auto &it : authors) {
+        dict.addAuthor(TEXTSFILEPATH + it);
+    }
+    dict.createText(OUTPUTFILEPATH, 100, 100);
 
     return 0;
 }
@@ -18,7 +28,7 @@ std::vector<std::string> parseInput(int argc, char** argv) {
     }
 
     std::vector<std::string> options;
-    for(int i = 1; i <= argc; ++i) {
+    for(int i = 2; i <= argc; ++i) {
         options.emplace_back([&]() -> std::string {
             std::string option(argv[1]);
             if (option.length() > 2 && option[0] == '-' && option[1] == '-') {
@@ -35,14 +45,15 @@ std::vector<std::string> parseInput(int argc, char** argv) {
         exit(1);
     }
 
-    for(unsigned long i = 0; i < options.size(); ++i) {
-
-    }
-
     return options;
 }
 
 void printHelp() {
-    std::cout << "\t--all: ";
-
+    std::cout << "Usage: ./markov_chains --[author names]" << std::endl;
+    std::cout << "\t--shakespeare = William Shakespeare" << std::endl;
+    std::cout << "\t--shakespeare = William Shakespeare" << std::endl;
+    std::cout << "\t--shakespeare = William Shakespeare" << std::endl;
+    std::cout << "\t--shakespeare = William Shakespeare" << std::endl;
+    std::cout << "\t--conandoyle = Arthur Conan Doyle" << std::endl;
+    std::cout << "\t--woodsworth = William Woodsworth" << std::endl;
 }
