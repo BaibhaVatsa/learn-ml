@@ -5,9 +5,9 @@ import gym
 import os
 
 learning_rate = 1e-3
-num_cycles = 1000
+num_cycles = 10000
 gamma = 0.99
-filename = 'agent99gamma1kepochskernelconv2d'
+filename = 'agent99gamma10kepochs'
 
 class Memory:
     def __init__(self):
@@ -27,8 +27,8 @@ def create_model():
     model = tf.keras.models.Sequential([
         tf.keras.layers.InputLayer(input_shape=(6400,), dtype=tf.float32),
         tf.keras.layers.Reshape((80, 80, 1)),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=(4,4), activation='relu', padding='same'),
-        tf.keras.layers.Conv2D(filters=32, kernel_size=(2,2), activation='relu', padding='same'),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=(8,8), strides=(4,4), activation='relu', padding='same'),
+        tf.keras.layers.Conv2D(filters=32, kernel_size=(4,4), strides=(2,2), activation='relu', padding='same'),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(units = 256, activation = 'relu'),
         tf.keras.layers.Dense(units = 6, activation = None)
@@ -77,6 +77,8 @@ def pre_process(image):
     return img.astype(np.float).ravel()
 
 if __name__ == "__main__":
+    import time
+    start = time.process_time()
     env = gym.make('Pong-v4')
     print("Number of obswervations: {}".format(env.observation_space))
     print("Number of allowed actions: {}".format(env.action_space))
@@ -84,7 +86,7 @@ if __name__ == "__main__":
     print(tf.keras.__version__)
     optimizer = tf.train.AdamOptimizer(learning_rate)
     model = create_model()
-    # model.load_weights('model/agentcycle1-agent99gamma1kepochs2maxpool')
+    # model.load_weights('model/agentcycle1750-agent99gamma1kepochs')
     # print(model.summary())
     # print('Model loaded successfully!')
     memory = Memory()
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     display = Display(visible=0)
     display.start()
     out = skvideo.io.FFmpegWriter(filename+'.mp4')
-
+    start_training = time.process_time()
     for cycle in range(num_cycles):
         observation = env.reset()
         previous_frame = pre_process(observation)
@@ -117,14 +119,18 @@ if __name__ == "__main__":
                 memory.clear()
                 os.system('clear')
                 print("Done {0}/{1}...\t{2:.2f}% done".format(cycle+1, num_cycles, (((cycle+1)/num_cycles)*100.0)))
-                if (cycle+1) % 100 is 0:
+                if (cycle+1) % 250 is 0:
                     tf.keras.models.save_model(model, filepath='model/agentcycle{}-{}'.format(cycle+1,filename), save_format='h5')
                     print('Keras Model saved!')
                     print(model.summary())
                 break
             observation = next_observation
             previous_frame = current_frame
+    end_training = time.process_time()
     env.close()
     out.close()
     tf.keras.models.save_model(model, filepath='model/agentcycle1000completed-{}'.format(filename), save_format='h5')
     print("Successfully saved video into {} and model!".format(filename))
+    print("Time taken in training: {}".format(end_training - start_training))
+    print("Time taken in preprocessing: {}".format(start_training - start))
+    print("Time taken in everything: {}".format(time.process_time() - start))
